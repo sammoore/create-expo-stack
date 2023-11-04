@@ -19,7 +19,8 @@ export const availablePackages = [
 	'reactnavigation',
 	'stylesheet',
 	'supabase',
-	'tamagui'
+	'tamagui',
+	'vexo-analytics'
 ] as const;
 
 export type NavigationTypes = 'stack' | 'tabs' | 'drawer' | undefined;
@@ -28,7 +29,7 @@ export type PackageManager = 'yarn' | 'npm' | 'pnpm' | 'bun';
 
 export type AvailablePackages = {
 	name: (typeof availablePackages)[number];
-	type: 'navigation' | 'styling' | 'authentication';
+	type: 'navigation' | 'styling' | 'authentication' | 'analytics';
 	options?: { type?: NavigationTypes };
 };
 
