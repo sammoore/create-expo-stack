@@ -105,6 +105,29 @@ If you've provided the relevant changeset summaries and the tests pass, then you
 
 > **_TODO:_** Add template for pull requests and issues
 
+#### Issues running `bun run changeset`
+
+If you encountered the following error when running `bun run changeset`:
+
+```sh
+% bunx changeset
+🦋  error Error: Failed to find where HEAD diverged from main. Does main exist?
+🦋  error     at getDivergedCommit (/home/me/git/danstepanov/create-expo-stack/node_modules/@changesets/git/dist/changesets-git.cjs.js:66:11)
+🦋  error     at async getChangedFilesSince (/home/me/git/danstepanov/create-expo-stack/node_modules/@changesets/git/dist/changesets-git.cjs.js:198:22)
+🦋  error     at async Object.getChangedPackagesSinceRef (/home/me/git/danstepanov/create-expo-stack/node_modules/@changesets/git/dist/changesets-git.cjs.js:239:24)
+🦋  error     at async add (/home/me/git/danstepanov/create-expo-stack/node_modules/@changesets/cli/dist/changesets-cli.cjs.js:500:29)
+🦋  error     at async run (/home/me/git/danstepanov/create-expo-stack/node_modules/@changesets/cli/dist/changesets-cli.cjs.js:1304:5)
+```
+
+This likely means you forked and/or cloned the repository before we changed the default branch from `beta` to `main`.
+
+To resolve this error, you'll need the `main` branch locally:
+
+1. Check the output of `git remote -v`. If you see a git URL for upstream (i.e. `danstepanov/create-expo-stack`), skip to step 4.
+2. Add the upstream remote to your local git repository: `git remote add upstream git@github.com:danstepanov/create-expo-stack.git`
+3. Fetch branch information from upstream: `git fetch upstream`
+4. Check out `main` locally: `git checkout main`
+
 ## CLI project structure
 
 ### Tests (`./__tests__`)
