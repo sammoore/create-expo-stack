@@ -7,4 +7,3 @@ dist
 build
 myTestProject
 .turbo
-package-lock.json
