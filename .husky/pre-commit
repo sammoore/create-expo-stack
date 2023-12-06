@@ -1,4 +1,4 @@
 #!/bin/sh
-bun run pretty-quick --staged
+bun run lint-staged
 
 git diff-index --cached HEAD | xargs -I{} echo {}
