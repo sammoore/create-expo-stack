@@ -2,5 +2,5 @@
  * @type {import("lint-staged").Config}
  */
 module.exports = {
-	"*": "bun run prettier --list-different",
+	"*.{astro,css,ejs,js,json,jsx,md,mdx,mjs,ts,tsx,yaml,yml}": "bun run prettier --list-different",
 }
