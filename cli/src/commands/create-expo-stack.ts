@@ -14,7 +14,7 @@ import {
 import { DEFAULT_APP_NAME, defaultOptions } from '../constants';
 import { CliResults, availablePackages } from '../types';
 import clearStylingPackages from '../utilities/clearStylingPackages';
-import { validateProjectName } from '../utilities/validateProjectName';
+import { ProjectNameAlreadyExistsError, validateProjectName } from '../utilities/validateProjectName';
 
 const command: GluegunCommand = {
 	name: 'create-expo-stack',
@@ -23,9 +23,9 @@ const command: GluegunCommand = {
 		const {
 			filesystem: { exists, removeAsync },
 			parameters: { first, options },
-			print: { info, highlight, success, warning },
+			print: { error, info, highlight, success, warning },
 			prompt,
-			strings: { pascalCase },
+			strings: { pascalCase }
 		} = toolbox;
 
 		const printSomethingWentWrong = () => {
@@ -43,8 +43,7 @@ const command: GluegunCommand = {
 		}
 
 		// Conditionally skip running the CLI
-		const useDefault =
-			(options.default !== undefined && options.default) || (options.d !== undefined && options.d);
+		const useDefault = (options.default !== undefined && options.default) || (options.d !== undefined && options.d);
 		const skipCLI = options.nonInteractive;
 		const useBlankTypescript = options.blank || false;
 		// Check if any of the options were passed in via the command
@@ -108,9 +107,14 @@ const command: GluegunCommand = {
 					cliResults.projectName
 				);
 			}
-		} catch (error) {
+		} catch (err) {
+			if (err instanceof ProjectNameAlreadyExistsError) {
+				error(`\nError: ${err.message}\n`);
+				return;
+			}
+
 			printSomethingWentWrong();
-			throw error;
+			throw err;
 		}
 
 		// Determine remaining options, run interactive CLI if necessary, and generate project
@@ -122,7 +126,15 @@ const command: GluegunCommand = {
 				// Check if the user wants to not install dependencies and/or not initialize git, update cliResults accordingly
 				cliResults.flags.noInstall = options.noInstall || false;
 				cliResults.flags.noGit = options.noGit || false;
-				cliResults.flags.packageManager = options.bun ? 'bun' : options.pnpm ? 'pnpm' : options.npm ? 'npm' : options.yarn ? 'yarn': undefined;
+				cliResults.flags.packageManager = options.bun
+					? 'bun'
+					: options.pnpm
+					  ? 'pnpm'
+					  : options.npm
+					    ? 'npm'
+					    : options.yarn
+					      ? 'yarn'
+					      : undefined;
 
 				// Validate import alias string forward slash and asterisk
 				if (typeof options.importAlias === 'string') {
@@ -274,7 +286,14 @@ const command: GluegunCommand = {
 
 				let files: string[] = [];
 
-				files = configureProjectFiles(authenticationPackage, files, navigationPackage, stylingPackage, toolbox, cliResults);
+				files = configureProjectFiles(
+					authenticationPackage,
+					files,
+					navigationPackage,
+					stylingPackage,
+					toolbox,
+					cliResults
+				);
 
 				// Once all the files are defined, format and generate them
 				let formattedFiles: any[] = [];
@@ -292,8 +311,8 @@ const command: GluegunCommand = {
 
 				await printOutput(cliResults, formattedFiles, toolbox);
 			}
-		} catch (error) {
-			if (error === "") {
+		} catch (err) {
+			if (err === '') {
 				// user cancelled/exited the interactive CLI
 				return void success(`\nCancelled... 👋 `);
 			}
@@ -302,7 +321,7 @@ const command: GluegunCommand = {
 			// await removeAsync(cliResults.projectName);
 
 			printSomethingWentWrong();
-			throw error;
+			throw err;
 		}
 	}
 };

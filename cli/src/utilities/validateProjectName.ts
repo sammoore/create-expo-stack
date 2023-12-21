@@ -21,5 +21,14 @@ export async function validateProjectName(exists: (path: string) => ExistsResult
 		}
 	  }
 
-	throw new Error(`A project with the name '${projectName}' already exists.`);
+	throw new ProjectNameAlreadyExistsError(projectName);
+}
+
+export class ProjectNameAlreadyExistsError extends Error {
+	projectName: string
+
+	constructor(projectName: string) {
+		super(`A project with the name '${projectName}' already exists.`);
+		this.projectName = projectName;
+	}
 }
